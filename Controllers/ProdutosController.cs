@@ -39,7 +39,7 @@ public class ProdutosController : ControllerBase
         try
         {
             if (pagina < 1)
-                return BadRequest(ApiResponseDTO<object>.Erro("O número da página deve ser maior que 0"));
+                return BadRequest(ApiResponseDTO<object>.CriarErro("O número da página deve ser maior que 0"));
 
             var query = _context.Produtos
                 .Include(p => p.IdTipoNavigation)
@@ -78,13 +78,13 @@ public class ProdutosController : ControllerBase
                 ItensPorPagina = ITENS_POR_PAGINA
             };
 
-            return Ok(ApiResponseDTO<PaginatedResponseDTO<ProdutoListaDTO>>.Sucesso(
+            return Ok(ApiResponseDTO<PaginatedResponseDTO<ProdutoListaDTO>>.CriarSucesso(
                 resposta, 
                 $"Total de {totalRegistros} produtos encontrados"));
         }
         catch (Exception ex)
         {
-            return StatusCode(500, ApiResponseDTO<object>.Erro(
+            return StatusCode(500, ApiResponseDTO<object>.CriarErro(
                 "Erro ao buscar produtos", 
                 new List<string> { ex.Message }));
         }
@@ -106,7 +106,7 @@ public class ProdutosController : ControllerBase
                 .FirstOrDefaultAsync(p => p.Id == id);
 
             if (produto == null)
-                return NotFound(ApiResponseDTO<object>.Erro("Produto não encontrado"));
+                return NotFound(ApiResponseDTO<object>.CriarErro("Produto não encontrado"));
 
             var dto = new ProdutoDTO
             {
@@ -125,11 +125,11 @@ public class ProdutosController : ControllerBase
                 DataAtualizacao = produto.DataAtualizacao
             };
 
-            return Ok(ApiResponseDTO<ProdutoDTO>.Sucesso(dto));
+            return Ok(ApiResponseDTO<ProdutoDTO>.CriarSucesso(dto));
         }
         catch (Exception ex)
         {
-            return StatusCode(500, ApiResponseDTO<object>.Erro(
+            return StatusCode(500, ApiResponseDTO<object>.CriarErro(
                 "Erro ao buscar produto", 
                 new List<string> { ex.Message }));
         }
@@ -149,18 +149,18 @@ public class ProdutosController : ControllerBase
             if (!ModelState.IsValid)
             {
                 var erros = ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage)).ToList();
-                return BadRequest(ApiResponseDTO<object>.Erro("Dados inválidos", erros));
+                return BadRequest(ApiResponseDTO<object>.CriarErro("Dados inválidos", erros));
             }
 
             // Validar se unidade existe
             var unidade = await _context.Unidades.FindAsync(createDto.IdUnidade);
             if (unidade == null)
-                return BadRequest(ApiResponseDTO<object>.Erro("Unidade não encontrada"));
+                return BadRequest(ApiResponseDTO<object>.CriarErro("Unidade não encontrada"));
 
             // Validar se tipo existe
             var tipo = await _context.TiposProdutos.FindAsync(createDto.IdTipo);
             if (tipo == null)
-                return BadRequest(ApiResponseDTO<object>.Erro("Tipo de produto não encontrado"));
+                return BadRequest(ApiResponseDTO<object>.CriarErro("Tipo de produto não encontrado"));
 
             var produto = new Produto
             {
@@ -195,11 +195,11 @@ public class ProdutosController : ControllerBase
             };
 
             return CreatedAtAction(nameof(GetProduto), new { id = produto.Id }, 
-                ApiResponseDTO<ProdutoDTO>.Sucesso(dto, "Produto criado com sucesso"));
+                ApiResponseDTO<ProdutoDTO>.CriarSucesso(dto, "Produto criado com sucesso"));
         }
         catch (Exception ex)
         {
-            return StatusCode(500, ApiResponseDTO<object>.Erro(
+            return StatusCode(500, ApiResponseDTO<object>.CriarErro(
                 "Erro ao criar produto", 
                 new List<string> { ex.Message }));
         }
@@ -217,27 +217,27 @@ public class ProdutosController : ControllerBase
         try
         {
             if (id != updateDto.Id)
-                return BadRequest(ApiResponseDTO<object>.Erro("ID da URL não corresponde ao ID do corpo"));
+                return BadRequest(ApiResponseDTO<object>.CriarErro("ID da URL não corresponde ao ID do corpo"));
 
             if (!ModelState.IsValid)
             {
                 var erros = ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage)).ToList();
-                return BadRequest(ApiResponseDTO<object>.Erro("Dados inválidos", erros));
+                return BadRequest(ApiResponseDTO<object>.CriarErro("Dados inválidos", erros));
             }
 
             var produto = await _context.Produtos.FindAsync(id);
             if (produto == null)
-                return NotFound(ApiResponseDTO<object>.Erro("Produto não encontrado"));
+                return NotFound(ApiResponseDTO<object>.CriarErro("Produto não encontrado"));
 
             // Validar se unidade existe
             var unidade = await _context.Unidades.FindAsync(updateDto.IdUnidade);
             if (unidade == null)
-                return BadRequest(ApiResponseDTO<object>.Erro("Unidade não encontrada"));
+                return BadRequest(ApiResponseDTO<object>.CriarErro("Unidade não encontrada"));
 
             // Validar se tipo existe
             var tipo = await _context.TiposProdutos.FindAsync(updateDto.IdTipo);
             if (tipo == null)
-                return BadRequest(ApiResponseDTO<object>.Erro("Tipo de produto não encontrado"));
+                return BadRequest(ApiResponseDTO<object>.CriarErro("Tipo de produto não encontrado"));
 
             produto.Nome = updateDto.Nome;
             produto.Caracteristicas = updateDto.Caracteristicas;
@@ -266,11 +266,11 @@ public class ProdutosController : ControllerBase
                 DataAtualizacao = produto.DataAtualizacao
             };
 
-            return Ok(ApiResponseDTO<ProdutoDTO>.Sucesso(dto, "Produto atualizado com sucesso"));
+            return Ok(ApiResponseDTO<ProdutoDTO>.CriarSucesso(dto, "Produto atualizado com sucesso"));
         }
         catch (Exception ex)
         {
-            return StatusCode(500, ApiResponseDTO<object>.Erro(
+            return StatusCode(500, ApiResponseDTO<object>.CriarErro(
                 "Erro ao atualizar produto", 
                 new List<string> { ex.Message }));
         }
@@ -288,17 +288,17 @@ public class ProdutosController : ControllerBase
         {
             var produto = await _context.Produtos.FindAsync(id);
             if (produto == null)
-                return NotFound(ApiResponseDTO<object>.Erro("Produto não encontrado"));
+                return NotFound(ApiResponseDTO<object>.CriarErro("Produto não encontrado"));
 
             produto.Ativo = false;
             _context.Produtos.Update(produto);
             await _context.SaveChangesAsync();
 
-            return Ok(ApiResponseDTO<object>.Sucesso(null, "Produto deletado com sucesso"));
+            return Ok(ApiResponseDTO<object>.CriarSucesso(null, "Produto deletado com sucesso"));
         }
         catch (Exception ex)
         {
-            return StatusCode(500, ApiResponseDTO<object>.Erro(
+            return StatusCode(500, ApiResponseDTO<object>.CriarErro(
                 "Erro ao deletar produto", 
                 new List<string> { ex.Message }));
         }
@@ -330,13 +330,13 @@ public class ProdutosController : ControllerBase
                 })
                 .ToListAsync();
 
-            return Ok(ApiResponseDTO<List<ProdutoListaDTO>>.Sucesso(
+            return Ok(ApiResponseDTO<List<ProdutoListaDTO>>.CriarSucesso(
                 produtos, 
                 $"{produtos.Count} produtos encontrados"));
         }
         catch (Exception ex)
         {
-            return StatusCode(500, ApiResponseDTO<object>.Erro(
+            return StatusCode(500, ApiResponseDTO<object>.CriarErro(
                 "Erro ao buscar produtos", 
                 new List<string> { ex.Message }));
         }

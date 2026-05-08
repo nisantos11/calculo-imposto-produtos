@@ -38,7 +38,7 @@ public class VendasController : ControllerBase
         try
         {
             if (pagina < 1)
-                return BadRequest(ApiResponseDTO<object>.Erro("O número da página deve ser maior que 0"));
+                return BadRequest(ApiResponseDTO<object>.CriarErro("O número da página deve ser maior que 0"));
 
             var query = _context.Vendas
                 .Include(v => v.ItensVenda)
@@ -81,13 +81,13 @@ public class VendasController : ControllerBase
                 ItensPorPagina = ITENS_POR_PAGINA
             };
 
-            return Ok(ApiResponseDTO<PaginatedResponseDTO<VendaListaDTO>>.Sucesso(
+            return Ok(ApiResponseDTO<PaginatedResponseDTO<VendaListaDTO>>.CriarSucesso(
                 resposta, 
                 $"Total de {totalRegistros} vendas encontradas"));
         }
         catch (Exception ex)
         {
-            return StatusCode(500, ApiResponseDTO<object>.Erro(
+            return StatusCode(500, ApiResponseDTO<object>.CriarErro(
                 "Erro ao buscar vendas", 
                 new List<string> { ex.Message }));
         }
@@ -109,7 +109,7 @@ public class VendasController : ControllerBase
                 .FirstOrDefaultAsync(v => v.Id == id);
 
             if (venda == null)
-                return NotFound(ApiResponseDTO<object>.Erro("Venda não encontrada"));
+                return NotFound(ApiResponseDTO<object>.CriarErro("Venda não encontrada"));
 
             var dto = new VendaDTO
             {
@@ -136,11 +136,11 @@ public class VendasController : ControllerBase
                 }).ToList()
             };
 
-            return Ok(ApiResponseDTO<VendaDTO>.Sucesso(dto));
+            return Ok(ApiResponseDTO<VendaDTO>.CriarSucesso(dto));
         }
         catch (Exception ex)
         {
-            return StatusCode(500, ApiResponseDTO<object>.Erro(
+            return StatusCode(500, ApiResponseDTO<object>.CriarErro(
                 "Erro ao buscar venda", 
                 new List<string> { ex.Message }));
         }
@@ -160,11 +160,11 @@ public class VendasController : ControllerBase
             if (!ModelState.IsValid)
             {
                 var erros = ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage)).ToList();
-                return BadRequest(ApiResponseDTO<object>.Erro("Dados inválidos", erros));
+                return BadRequest(ApiResponseDTO<object>.CriarErro("Dados inválidos", erros));
             }
 
             if (!createDto.Itens.Any())
-                return BadRequest(ApiResponseDTO<object>.Erro("A venda deve conter pelo menos um item"));
+                return BadRequest(ApiResponseDTO<object>.CriarErro("A venda deve conter pelo menos um item"));
 
             // Buscar todos os produtos da venda
             var produtoIds = createDto.Itens.Select(i => i.IdProduto).Distinct().ToList();
@@ -174,7 +174,7 @@ public class VendasController : ControllerBase
                 .ToListAsync();
 
             if (produtos.Count != produtoIds.Count)
-                return BadRequest(ApiResponseDTO<object>.Erro("Um ou mais produtos não foram encontrados"));
+                return BadRequest(ApiResponseDTO<object>.CriarErro("Um ou mais produtos não foram encontrados"));
 
             // Calcular totais
             decimal valorTotalItens = 0;
@@ -185,7 +185,7 @@ public class VendasController : ControllerBase
             {
                 var produto = produtos.FirstOrDefault(p => p.Id == item.IdProduto);
                 if (produto == null)
-                    return BadRequest(ApiResponseDTO<object>.Erro($"Produto {item.IdProduto} não encontrado"));
+                    return BadRequest(ApiResponseDTO<object>.CriarErro($"Produto {item.IdProduto} não encontrado"));
 
                 decimal valorTotalItem = item.Quantidade * produto.ValorUnitario;
                 decimal aliquota = produto.IdTipoNavigation.Aliquota / 100;
@@ -248,11 +248,11 @@ public class VendasController : ControllerBase
             };
 
             return CreatedAtAction(nameof(GetVenda), new { id = venda.Id }, 
-                ApiResponseDTO<VendaDTO>.Sucesso(dto, "Venda criada com sucesso"));
+                ApiResponseDTO<VendaDTO>.CriarSucesso(dto, "Venda criada com sucesso"));
         }
         catch (Exception ex)
         {
-            return StatusCode(500, ApiResponseDTO<object>.Erro(
+            return StatusCode(500, ApiResponseDTO<object>.CriarErro(
                 "Erro ao criar venda", 
                 new List<string> { ex.Message }));
         }
@@ -284,13 +284,13 @@ public class VendasController : ControllerBase
                 .OrderByDescending(r => r.Data)
                 .ToListAsync();
 
-            return Ok(ApiResponseDTO<List<RelatorioVendasDTO>>.Sucesso(
+            return Ok(ApiResponseDTO<List<RelatorioVendasDTO>>.CriarSucesso(
                 relatorio, 
                 $"Relatório com {relatorio.Count} dias"));
         }
         catch (Exception ex)
         {
-            return StatusCode(500, ApiResponseDTO<object>.Erro(
+            return StatusCode(500, ApiResponseDTO<object>.CriarErro(
                 "Erro ao gerar relatório", 
                 new List<string> { ex.Message }));
         }
@@ -321,11 +321,11 @@ public class VendasController : ControllerBase
                 .OrderByDescending(r => r.ValorFinalTotal)
                 .ToListAsync();
 
-            return Ok(ApiResponseDTO<object>.Sucesso(relatorio, "Relatório por tipo de produto"));
+            return Ok(ApiResponseDTO<object>.CriarSucesso(relatorio, "Relatório por tipo de produto"));
         }
         catch (Exception ex)
         {
-            return StatusCode(500, ApiResponseDTO<object>.Erro(
+            return StatusCode(500, ApiResponseDTO<object>.CriarErro(
                 "Erro ao gerar relatório", 
                 new List<string> { ex.Message }));
         }

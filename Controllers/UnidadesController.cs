@@ -45,13 +45,13 @@ public class UnidadesController : ControllerBase
                 .OrderBy(u => u.Sigla)
                 .ToListAsync();
 
-            return Ok(ApiResponseDTO<List<UnidadeDTO>>.Sucesso(
+            return Ok(ApiResponseDTO<List<UnidadeDTO>>.CriarSucesso(
                 unidades, 
                 $"Total de {unidades.Count} unidades encontradas"));
         }
         catch (Exception ex)
         {
-            return StatusCode(500, ApiResponseDTO<object>.Erro(
+            return StatusCode(500, ApiResponseDTO<object>.CriarErro(
                 "Erro ao buscar unidades", 
                 new List<string> { ex.Message }));
         }
@@ -70,7 +70,7 @@ public class UnidadesController : ControllerBase
             var unidade = await _context.Unidades.FindAsync(id);
 
             if (unidade == null)
-                return NotFound(ApiResponseDTO<object>.Erro("Unidade não encontrada"));
+                return NotFound(ApiResponseDTO<object>.CriarErro("Unidade não encontrada"));
 
             var dto = new UnidadeDTO
             {
@@ -81,11 +81,11 @@ public class UnidadesController : ControllerBase
                 DataCriacao = unidade.DataCriacao
             };
 
-            return Ok(ApiResponseDTO<UnidadeDTO>.Sucesso(dto));
+            return Ok(ApiResponseDTO<UnidadeDTO>.CriarSucesso(dto));
         }
         catch (Exception ex)
         {
-            return StatusCode(500, ApiResponseDTO<object>.Erro(
+            return StatusCode(500, ApiResponseDTO<object>.CriarErro(
                 "Erro ao buscar unidade", 
                 new List<string> { ex.Message }));
         }
@@ -104,7 +104,7 @@ public class UnidadesController : ControllerBase
             if (!ModelState.IsValid)
             {
                 var erros = ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage)).ToList();
-                return BadRequest(ApiResponseDTO<object>.Erro("Dados inválidos", erros));
+                return BadRequest(ApiResponseDTO<object>.CriarErro("Dados inválidos", erros));
             }
 
             // Verificar se já existe unidade com mesma sigla
@@ -112,7 +112,7 @@ public class UnidadesController : ControllerBase
                 .AnyAsync(u => u.Sigla.ToUpper() == createDto.Sigla.ToUpper());
 
             if (existe)
-                return BadRequest(ApiResponseDTO<object>.Erro("Já existe uma unidade com esta sigla"));
+                return BadRequest(ApiResponseDTO<object>.CriarErro("Já existe uma unidade com esta sigla"));
 
             var unidade = new Unidade
             {
@@ -135,11 +135,11 @@ public class UnidadesController : ControllerBase
             };
 
             return CreatedAtAction(nameof(GetUnidade), new { id = unidade.Id }, 
-                ApiResponseDTO<UnidadeDTO>.Sucesso(dto, "Unidade criada com sucesso"));
+                ApiResponseDTO<UnidadeDTO>.CriarSucesso(dto, "Unidade criada com sucesso"));
         }
         catch (Exception ex)
         {
-            return StatusCode(500, ApiResponseDTO<object>.Erro(
+            return StatusCode(500, ApiResponseDTO<object>.CriarErro(
                 "Erro ao criar unidade", 
                 new List<string> { ex.Message }));
         }
@@ -157,24 +157,24 @@ public class UnidadesController : ControllerBase
         try
         {
             if (id != updateDto.Id)
-                return BadRequest(ApiResponseDTO<object>.Erro("ID da URL não corresponde ao ID do corpo"));
+                return BadRequest(ApiResponseDTO<object>.CriarErro("ID da URL não corresponde ao ID do corpo"));
 
             if (!ModelState.IsValid)
             {
                 var erros = ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage)).ToList();
-                return BadRequest(ApiResponseDTO<object>.Erro("Dados inválidos", erros));
+                return BadRequest(ApiResponseDTO<object>.CriarErro("Dados inválidos", erros));
             }
 
             var unidade = await _context.Unidades.FindAsync(id);
             if (unidade == null)
-                return NotFound(ApiResponseDTO<object>.Erro("Unidade não encontrada"));
+                return NotFound(ApiResponseDTO<object>.CriarErro("Unidade não encontrada"));
 
             // Verificar se já existe outra unidade com mesma sigla
             var existe = await _context.Unidades
                 .AnyAsync(u => u.Sigla.ToUpper() == updateDto.Sigla.ToUpper() && u.Id != id);
 
             if (existe)
-                return BadRequest(ApiResponseDTO<object>.Erro("Já existe outra unidade com esta sigla"));
+                return BadRequest(ApiResponseDTO<object>.CriarErro("Já existe outra unidade com esta sigla"));
 
             unidade.Sigla = updateDto.Sigla.ToUpper();
             unidade.Descricao = updateDto.Descricao;
@@ -191,11 +191,11 @@ public class UnidadesController : ControllerBase
                 DataCriacao = unidade.DataCriacao
             };
 
-            return Ok(ApiResponseDTO<UnidadeDTO>.Sucesso(dto, "Unidade atualizada com sucesso"));
+            return Ok(ApiResponseDTO<UnidadeDTO>.CriarSucesso(dto, "Unidade atualizada com sucesso"));
         }
         catch (Exception ex)
         {
-            return StatusCode(500, ApiResponseDTO<object>.Erro(
+            return StatusCode(500, ApiResponseDTO<object>.CriarErro(
                 "Erro ao atualizar unidade", 
                 new List<string> { ex.Message }));
         }
@@ -213,22 +213,22 @@ public class UnidadesController : ControllerBase
         {
             var unidade = await _context.Unidades.FindAsync(id);
             if (unidade == null)
-                return NotFound(ApiResponseDTO<object>.Erro("Unidade não encontrada"));
+                return NotFound(ApiResponseDTO<object>.CriarErro("Unidade não encontrada"));
 
             // Verificar se existem produtos com esta unidade
             var temProdutos = await _context.Produtos.AnyAsync(p => p.IdUnidade == id);
             if (temProdutos)
-                return BadRequest(ApiResponseDTO<object>.Erro("Não é possível deletar uma unidade que possui produtos associados"));
+                return BadRequest(ApiResponseDTO<object>.CriarErro("Não é possível deletar uma unidade que possui produtos associados"));
 
             unidade.Ativo = false;
             _context.Unidades.Update(unidade);
             await _context.SaveChangesAsync();
 
-            return Ok(ApiResponseDTO<object>.Sucesso(null, "Unidade deletada com sucesso"));
+            return Ok(ApiResponseDTO<object>.CriarSucesso(null, "Unidade deletada com sucesso"));
         }
         catch (Exception ex)
         {
-            return StatusCode(500, ApiResponseDTO<object>.Erro(
+            return StatusCode(500, ApiResponseDTO<object>.CriarErro(
                 "Erro ao deletar unidade", 
                 new List<string> { ex.Message }));
         }

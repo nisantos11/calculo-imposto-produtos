@@ -21,7 +21,7 @@ public class ApiResponseDTO<T>
     /// <summary>
     /// Cria uma resposta de sucesso
     /// </summary>
-    public static ApiResponseDTO<T> Sucesso(T dados, string mensagem = "Operação realizada com sucesso")
+    public static ApiResponseDTO<T> CriarSucesso(T dados, string mensagem = "Operação realizada com sucesso")
     {
         return new ApiResponseDTO<T>
         {
@@ -34,7 +34,7 @@ public class ApiResponseDTO<T>
     /// <summary>
     /// Cria uma resposta de erro
     /// </summary>
-    public static ApiResponseDTO<T> Erro(string mensagem, List<string>? erros = null)
+    public static ApiResponseDTO<T> CriarErro(string mensagem, List<string>? erros = null)
     {
         return new ApiResponseDTO<T>
         {
