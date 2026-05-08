@@ -6,6 +6,56 @@
     <title>Gerenciar Produtos - Cálculo Imposto Produtos</title>
     <link rel="stylesheet" href="css/style.css">
     <style>
+        nav {
+            background-color: #333;
+            padding: 0;
+            margin: 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            margin: 0;
+            padding: 0;
+            flex-wrap: wrap;
+        }
+
+        nav li {
+            margin: 0;
+        }
+
+        nav a {
+            display: block;
+            color: white;
+            text-align: center;
+            padding: 14px 20px;
+            text-decoration: none;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        nav a:hover {
+            background-color: #4CAF50;
+        }
+
+        nav a.ativo {
+            background-color: #4CAF50;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            nav ul {
+                flex-direction: column;
+            }
+
+            nav a {
+                padding: 10px 15px;
+                font-size: 14px;
+            }
+        }
+    </style>
+    <style>
         .container-produtos {
             max-width: 1200px;
             margin: 0 auto;
@@ -200,6 +250,16 @@
     </style>
 </head>
 <body>
+    <!-- Navegação -->
+    <nav>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="produtos.html" class="ativo">Gerenciar Produtos</a></li>
+            <li><a href="vendas.html">Gerenciar Vendas</a></li>
+            <li><a href="relatorios.html">Relatórios</a></li>
+        </ul>
+    </nav>
+
     <div class="container-produtos">
         <div class="header-produtos">
             <h1>Gerenciar Produtos</h1>
