@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cálculo Imposto Produtos</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Cálculo Imposto Produtos</h1>
+            <p>Sistema de cadastro de produtos com cálculo automático de impostos</p>
+        </header>
+
+        <main>
+            <section class="form-section">
+                <h2>Adicionar Novo Produto</h2>
+                <form id="produtoForm">
+                    <div class="form-group">
+                        <label for="produto">Produto:</label>
+                        <input type="text" id="produto" name="produto" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="caracteristicas">Características:</label>
+                        <textarea id="caracteristicas" name="caracteristicas" required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="valorUnitario">Valor Unitário (R$):</label>
+                        <input type="number" id="valorUnitario" name="valorUnitario" step="0.01" min="0" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="unidade">Unidade:</label>
+                        <select id="unidade" name="unidade" required>
+                            <option value="">Selecione uma unidade</option>
+                            <option value="UN">UN - Unidade</option>
+                            <option value="KG">KG - Quilograma</option>
+                            <option value="L">L - Litro</option>
+                            <option value="M">M - Metro</option>
+                            <option value="CX">CX - Caixa</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Tipo de Produto:</label>
+                        <div class="radio-group">
+                            <label><input type="radio" name="tipo" value="1" required> Tipo 1 - Isento (0%)</label>
+                            <label><input type="radio" name="tipo" value="2" required> Tipo 2 - Normal (8%)</label>
+                            <label><input type="radio" name="tipo" value="3" required> Tipo 3 - Intermediário (10%)</label>
+                            <label><input type="radio" name="tipo" value="4" required> Tipo 4 - Especial (12%)</label>
+                            <label><input type="radio" name="tipo" value="5" required> Tipo 5 - Premium (17%)</label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-submit">Adicionar Produto</button>
+                </form>
+            </section>
+
+            <section class="list-section">
+                <h2>Produtos Cadastrados</h2>
+                <div id="listaProdutos" class="lista-produtos">
+                    <p class="vazio">Nenhum produto cadastrado ainda</p>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>&copy; 2026 - Cálculo Imposto Produtos | SENAI - Codificação Front-End</p>
+        </footer>
+    </div>
+
+    <script src="js/script.js"></script>
+</body>
+</html>
