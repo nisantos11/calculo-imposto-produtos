@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatórios - Cálculo Imposto Produtos</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .container-relatorios {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header-relatorios {
+            margin-bottom: 30px;
+        }
+
+        .header-relatorios h1 {
+            margin-bottom: 10px;
+        }
+
+        .filtros {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filtros input,
+        .filtros button {
+            padding: 8px 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .filtros button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .filtros button:hover {
+            background-color: #45a049;
+        }
+
+        .relatorio-secao {
+            background-color: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .relatorio-secao h2 {
+            margin-top: 0;
+            color: #333;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 10px;
+        }
+
+        .tabela-relatorio {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .tabela-relatorio thead {
+            background-color: #f5f5f5;
+        }
+
+        .tabela-relatorio th,
+        .tabela-relatorio td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .tabela-relatorio th {
+            font-weight: bold;
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .tabela-relatorio tbody tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        .resumo-valores {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .card-valor {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .card-valor.itens {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .card-valor.impostos {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .card-valor.final {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+
+        .card-valor h3 {
+            margin: 0 0 10px 0;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .card-valor .valor {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .notificacao {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            display: none;
+        }
+
+        .notificacao.sucesso {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: block;
+        }
+
+        .notificacao.erro {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: block;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            font-size: 18px;
+            color: #666;
+        }
+
+        .vazio {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+            font-size: 18px;
+        }
+
+        .btn-exportar {
+            background-color: #2196F3;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .btn-exportar:hover {
+            background-color: #0b7dda;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-relatorios">
+        <div class="header-relatorios">
+            <h1>Relatórios</h1>
+            <p>Análise de vendas e impostos</p>
+        </div>
+
+        <div id="notificacao" class="notificacao"></div>
+
+        <!-- Relatório por Período -->
+        <div class="relatorio-secao">
+            <h2>Relatório de Vendas por Período</h2>
+            
+            <div class="filtros">
+                <input type="date" id="dataInicio" placeholder="Data Início">
+                <input type="date" id="dataFim" placeholder="Data Fim">
+                <button onclick="carregarRelatorioPeriodo()">Gerar Relatório</button>
+            </div>
+
+            <div id="carregandoPeriodo" class="loading" style="display: none;">
+                Carregando relatório...
+            </div>
+
+            <div id="resumoPeriodo" class="resumo-valores" style="display: none;"></div>
+
+            <table class="tabela-relatorio" id="tabelaPeriodo" style="display: none;">
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Total de Vendas</th>
+                        <th>Valor Itens</th>
+                        <th>Valor Impostos</th>
+                        <th>Valor Final</th>
+                        <th>Ticket Médio</th>
+                    </tr>
+                </thead>
+                <tbody id="corpoTabelaPeriodo">
+                </tbody>
+            </table>
+
+            <div id="vazioPeríodo" class="vazio" style="display: none;">
+                Nenhum dado para o período selecionado
+            </div>
+
+            <button class="btn-exportar" onclick="exportarPeriodoCSV()">Exportar para CSV</button>
+        </div>
+
+        <!-- Relatório por Tipo de Produto -->
+        <div class="relatorio-secao">
+            <h2>Relatório de Vendas por Tipo de Produto</h2>
+
+            <button onclick="carregarRelatorioTipo()">Gerar Relatório</button>
+
+            <div id="carregandoTipo" class="loading" style="display: none;">
+                Carregando relatório...
+            </div>
+
+            <table class="tabela-relatorio" id="tabelaTipo" style="display: none;">
+                <thead>
+                    <tr>
+                        <th>Tipo de Produto</th>
+                        <th>Total de Itens</th>
+                        <th>Quantidade Total</th>
+                        <th>Valor Itens</th>
+                        <th>Valor Impostos</th>
+                        <th>Valor Final</th>
+                        <th>Valor Médio/Item</th>
+                    </tr>
+                </thead>
+                <tbody id="corpoTabelaTipo">
+                </tbody>
+            </table>
+
+            <div id="vazioTipo" class="vazio" style="display: none;">
+                Nenhum dado disponível
+            </div>
+
+            <button class="btn-exportar" onclick="exportarTipoCSV()">Exportar para CSV</button>
+        </div>
+    </div>
+
+    <script src="js/api/config.js"></script>
+    <script src="js/api/api_vendas.js"></script>
+    <script src="js/pages/relatorios.js"></script>
+</body>
+</html>

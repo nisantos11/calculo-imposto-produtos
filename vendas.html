@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciar Vendas - Cálculo Imposto Produtos</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .container-vendas {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header-vendas {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .btn-nova {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .btn-nova:hover {
+            background-color: #45a049;
+        }
+
+        .filtros {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filtros input {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .tabela-vendas {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .tabela-vendas thead {
+            background-color: #f5f5f5;
+        }
+
+        .tabela-vendas th,
+        .tabela-vendas td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .tabela-vendas th {
+            font-weight: bold;
+            background-color: #2196F3;
+            color: white;
+        }
+
+        .tabela-vendas tbody tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        .btn-visualizar,
+        .btn-deletar {
+            padding: 5px 10px;
+            margin-right: 5px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn-visualizar {
+            background-color: #2196F3;
+            color: white;
+        }
+
+        .btn-visualizar:hover {
+            background-color: #0b7dda;
+        }
+
+        .btn-deletar {
+            background-color: #f44336;
+            color: white;
+        }
+
+        .btn-deletar:hover {
+            background-color: #da190b;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 90%;
+            max-width: 800px;
+            border-radius: 5px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: black;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .btn-salvar {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .btn-salvar:hover {
+            background-color: #45a049;
+        }
+
+        .notificacao {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            display: none;
+        }
+
+        .notificacao.sucesso {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: block;
+        }
+
+        .notificacao.erro {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: block;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            font-size: 18px;
+            color: #666;
+        }
+
+        .vazio {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+            font-size: 18px;
+        }
+
+        .detalhes-venda {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+
+        .detalhes-venda h3 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        .item-venda {
+            background-color: white;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-left: 4px solid #2196F3;
+        }
+
+        .item-venda-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-vendas">
+        <div class="header-vendas">
+            <h1>Gerenciar Vendas</h1>
+            <button class="btn-nova" onclick="abrirModalNovaVenda()">+ Nova Venda</button>
+        </div>
+
+        <div id="notificacao" class="notificacao"></div>
+
+        <div class="filtros">
+            <input type="date" id="dataInicio" placeholder="Data Início">
+            <input type="date" id="dataFim" placeholder="Data Fim">
+            <button class="btn-nova" onclick="filtrarVendas()">Filtrar</button>
+        </div>
+
+        <div id="carregando" class="loading" style="display: none;">
+            Carregando vendas...
+        </div>
+
+        <table class="tabela-vendas" id="tabelaVendas" style="display: none;">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Data</th>
+                    <th>Total Itens</th>
+                    <th>Impostos</th>
+                    <th>Total Final</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="corpoTabela">
+            </tbody>
+        </table>
+
+        <div id="vazio" class="vazio" style="display: none;">
+            Nenhuma venda cadastrada
+        </div>
+    </div>
+
+    <!-- Modal para nova venda -->
+    <div id="modalVenda" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="fecharModal()">&times;</span>
+            <h2>Nova Venda</h2>
+            <form id="formVenda">
+                <div class="form-group">
+                    <label for="idProduto">Produto:</label>
+                    <select id="idProduto" required></select>
+                </div>
+
+                <div class="form-group">
+                    <label for="quantidade">Quantidade:</label>
+                    <input type="number" id="quantidade" min="1" value="1" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="observacoes">Observações:</label>
+                    <textarea id="observacoes"></textarea>
+                </div>
+
+                <div id="itensVenda" style="margin-bottom: 20px;"></div>
+
+                <button type="button" class="btn-nova" onclick="adicionarItemVenda()">Adicionar Item</button>
+                <button type="submit" class="btn-salvar">Salvar Venda</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal para visualizar venda -->
+    <div id="modalVisualizarVenda" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="fecharModalVisualizacao()">&times;</span>
+            <h2>Detalhes da Venda</h2>
+            <div id="detalhesVenda"></div>
+        </div>
+    </div>
+
+    <script src="js/api/config.js"></script>
+    <script src="js/api/api_vendas.js"></script>
+    <script src="js/api/api_produtos.js"></script>
+    <script src="js/pages/vendas.js"></script>
+</body>
+</html>
